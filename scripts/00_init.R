@@ -12,6 +12,7 @@ message("./R/functions.R is loaded.")
 required_packages <-
   c(
     "dataverse",
+    "mice",
     "knitr",
     "kableExtra",
     "tidyverse",
