@@ -54,14 +54,14 @@ vars_na3 <-
 # later. For now, let's combine them then exclude them from the sifting step
 # in the next code block.
 vars_naall <- unique(c(vars_na1, vars_na2, vars_na3))
-coviddata_exclna <- coviddata_num[, -which(names(coviddata_num) %in% vars_naall)]
+coviddata_exclNA <- coviddata_num[, -which(names(coviddata_num) %in% vars_naall)]
 detach(coviddata_num)
-attach(coviddata_exclna)
+attach(coviddata_exclNA)
 
-# Sift through datadict_exclna and categorize each variable by type (i.e., 
-# categorical, ordinal, continuous, or has NA or missing values)
-datadict_exclna <- sapply(
-  coviddata_exclna,
+# Sift through datadict_exclNA and categorize each variable by type (i.e., 
+# categorical, ordinal, continuous, has NA or missing values)
+datadict_exclNA <- sapply(
+  coviddata_exclNA,
   function(x) {
     a <- attr(x, "label", exact = TRUE)
     b <- attr(x, "labels", exact = TRUE)
@@ -71,46 +71,52 @@ datadict_exclna <- sapply(
 )
 
 vars_cat <- bind_cols(
-  "Timepoint_1" = Timepoint_1,      # Identifier for time when survey collected
-  "Timepoint_2" = Timepoint_2,      # Identifier for time when survey collected
-  "Timepoint_3" = Timepoint_3,      # Identifier for time when survey collected
-  "S3"          = S3,               # Gender (incl. other/prefer not to answer/rather not say)
-  "S4"          = S4,               # Racial or ethnic group (incl. "rather not say")
-  "S5"          = S5,               # Religion (incl. "rather not say")
-  "S6A"         = S6A,              # Relationship status
-  "S6B"         = S6B,              # Type of dwelling (incl. "rather not say")
-  "S7A"         = S7A,              # Employment status (incl. "rather not say")
-  "S8D"         = S8D,              # Received government stimulus (y/n/"rather not say")
-  "S8F"         = S8F,              # Received employment insurance (y/n/"rather not say")
-  "CVSQ1"       = CVSQ1,            # Source of health information (incl. other)
-  "C2"          = C2,               # Close contact of COVID-19 (y/n/unsure)
-  "RF1r1"       = RF1r1,            # Have heart disease (y/n)
-  "RF1r2"       = RF1r2,            # Have hypertension (y/n)
-  "RF1r3"       = RF1r3,            # Have lung disease (y/n)
-  "RF1r4"       = RF1r4,            # Have diabetes (y/n)
-  "RF1r5"       = RF1r5,            # Have cancer (y/n)
-  "RF1r6"       = RF1r6,            # Have chronic kidney disease (y/n)
-  "RF1r7"       = RF1r7,            # Have obesity (y/n)
-  "RF2"         = RF2,              # Have weakened immune system (y/n)
-  "ASr1"        = ASr1,             # Have fever/chills/shakes (y/n)
-  "ASr2"        = ASr2,             # Have cough (y/n)
-  "ASr3"        = ASr3,             # Have shortness of breath (y/n)
-  "ASr4"        = ASr4,             # Have tired or fatigued(y/n)
-  "ASr5"        = ASr5,             # Have lost appetite (y/n)
-  "ASr6"        = ASr6,             # Have muscle aches and pains (y/n)
-  "ASr7"        = ASr7,             # Have nasal congestion (y/n)
-  "ASr8"        = ASr8,             # Have sore throat (y/n)
-  "ASr9"        = ASr9,             # Have excessive sputum (y/n)
-  "ASr10"       = ASr10,            # Have lost smell (y/n)
-  "ASr11"       = ASr11,            # Have lost taste (y/n)
-  "ASr12"       = ASr12,            # Have diarrhea (y/n)
-  "ASr13"       = ASr13,            # Have other symptoms (y/n)
-  "CVSQ2"       = CVSQ2,            # Belief of origin of COVID-19 (incl. other)
-  "CVSQ3"       = CVSQ3,            # Had COVID/what was outcome
-  "CVSQCVSQ4"   = CVSQCVSQ4,        # Close family member or friend that is health care worker (y/n)
-  "CVSQCVSQ5"   = CVSQCVSQ5,        # Close family member or friend that is high risk (y/n)
-  "CVSQCVSQ6"   = CVSQCVSQ6,        # Close family member or friend in senior's residence (y/n)
-  "CVSQCVSQ7"   = CVSQCVSQ7         # Close family member or friend in long-term care (y/n)
+  "Timepoint_1"     = Timepoint_1,      # Identifier for time when survey collected
+  "Timepoint_2"     = Timepoint_2,      # Identifier for time when survey collected
+  "Timepoint_3"     = Timepoint_3,      # Identifier for time when survey collected
+  "S6A"             = S6A,              # Relationship status
+  "S6D"             = S6D,              # Health care worker (y/n)
+  "RF1r1"           = RF1r1,            # Have heart disease (y/n)
+  "RF1r2"           = RF1r2,            # Have hypertension (y/n)
+  "RF1r3"           = RF1r3,            # Have lung disease (y/n)
+  "RF1r4"           = RF1r4,            # Have diabetes (y/n)
+  "RF1r5"           = RF1r5,            # Have cancer (y/n)
+  "RF1r6"           = RF1r6,            # Have chronic kidney disease (y/n)
+  "RF1r7"           = RF1r7,            # Have obesity (y/n)
+  "RF2"             = RF2,              # Have weakened immune system (y/n)
+  "ASr1"            = ASr1,             # Have fever/chills/shakes (y/n)
+  "ASr2"            = ASr2,             # Have cough (y/n)
+  "ASr3"            = ASr3,             # Have shortness of breath (y/n)
+  "ASr4"            = ASr4,             # Have tired or fatigued(y/n)
+  "ASr5"            = ASr5,             # Have lost appetite (y/n)
+  "ASr6"            = ASr6,             # Have muscle aches and pains (y/n)
+  "ASr7"            = ASr7,             # Have nasal congestion (y/n)
+  "ASr8"            = ASr8,             # Have sore throat (y/n)
+  "ASr9"            = ASr9,             # Have excessive sputum (y/n)
+  "ASr10"           = ASr10,            # Have lost smell (y/n)
+  "ASr11"           = ASr11,            # Have lost taste (y/n)
+  "ASr12"           = ASr12,            # Have diarrhea (y/n)
+  "ASr13"           = ASr13,            # Have other symptoms (y/n)
+  "C1"              = C1,               # Ever tested for COVID-19 (y/n)
+  "CVSQ1"           = CVSQ1,            # Source of health information (incl. other)
+  "CVSQ2"           = CVSQ2,            # Belief of origin of COVID-19 (incl. other)
+  "CVSQ3"           = CVSQ3,            # Had COVID/what was outcome
+  "CVSQCVSQ4"       = CVSQCVSQ4,        # Close family member or friend that is health care worker (y/n)
+  "CVSQCVSQ5"       = CVSQCVSQ5,        # Close family member or friend that is high risk (y/n)
+  "CVSQCVSQ6"       = CVSQCVSQ6,        # Close family member or friend in senior's residence (y/n)
+  "CVSQCVSQ7"       = CVSQCVSQ7,        # Close family member or friend in long-term care (y/n)
+  "noanswerS15_r0"  = noanswerS15_r0,   # cat; Number of drinks in last 7 days (non-drinkers)
+  "noanswerS15_r1"  = noanswerS15_r1,   # cat; Number of drinks in last 7 days (less than 1 per week)
+  "noanswerS15_r2"  = noanswerS15_r2,   # cat; Number of drinks in last 7 days (it depends)
+  "S16A"            = S16A,             # Use of cannabis products (combine with below)
+  "noanswerS16C_r1" = noanswerS16C_r1,  # cat; Number of cannabis products (less than 1 per day)
+  "noanswerS16C_r2" = noanswerS16C_r2,  # cat; Number of cannabis products (it depends)
+  "noanswerS17A_r0" = noanswerS17A_r0,  # cat; Number of cigarettes (non-smokers)
+  "noanswerS17A_r1" = noanswerS17A_r1,  # cat; Number of cigarettes (less than 1 per day)
+  "noanswerS17A_r2" = noanswerS17A_r2,  # con; Number of cigarettes (it depends)
+  "noanswerS17B_r0" = noanswerS17B_r0,  # cat; Number of e-cigarettes (non-users)
+  "noanswerS17B_r1" = noanswerS17B_r1,  # cat; Number of e-cigarettes (less than 1 per day)
+  "noanswerS17B_r2" = noanswerS17B_r2   # cat; Number of e-cigarettes (it depends)
 )
 
 vars_ord <- bind_cols(
@@ -131,6 +137,7 @@ vars_ord <- bind_cols(
   "SPQr8"         = SPQr8,                # Wash or disinfect hands for at least 20 seconds
   "SPQr9"         = SPQr9,                # Cough or sneeze into bend of arm
   "SPQr10"        = SPQr10,               # Avoid touching eyes, nose, mouth
+  "SPQ11A"        = SPQ11A,               # Exercise frequency
   "SSSQr1"        = SSSQr1,               # Easily influenced by people's opinions
   "SSSQr2"        = SSSQr2,               # Easily influenced by commercials
   "SSSQr3"        = SSSQr3,               # Likely to cough or sneeze when seeing others do so
@@ -283,326 +290,211 @@ vars_ord <- bind_cols(
   "ECR_16"        = ECR_16                # Resent when people I am close to spend time away from me
 )
 
-
 vars_con <- bind_cols(
   "S2" = S2 # Year of birth
 )
 
-vars_na <- bind_cols(
-  
-  # Add label for S6E non health care worker
-  "S6D" = S6D, # Health care worker (y/n)
-  "S6E" = S6E, # cat; Hospital or long-term care worker (y/n/NA)
-  
-  # Add label for S7C not laid off
-  "S7B" = S7B, # Laid off because of COVID-19 (y/n/"rather not say")
-  "S7C" = S7C, # cat; Temporarily or permanently laid off (y/n/NA)
-  
-  "Provinces_Canada" = Provinces_Canada, # cat; Province (for Canadian responses, incl. NA for US)
-  
-  # Add label for S16B non-users
-  "S16A" = S16A, # cat; Use of cannabis products (combine with below)
-  "S16B" = S16B, # cat, Type of cannabis product (no 0; incl. NA)
-  
-  # Impute missing values
-  "S11A" = S11A, # ord; Father's level of education (incl. "don't know")
-  "S11C" = S11C, # ord; Mother's level of education (incl. "don't know")
-  "S1B" = S1B, # Population of area (incl. NA and "don't know")
-  "S6Fr1" = S6Fr1, # ord; Number living in household (incl. NA)
-  "S6H" = S6H, # ord; Household income (incl. no-responses; change to NA)
-  
-  # Add label for no children
-  "S6Gr1" = S6Gr1, # ord; Number of children under 6 (incl. NA)
-  "S6Gr2" = S6Gr2, # ord; Number of children 6 to 12 (incl. NA)
-  "S6Gr3" = S6Gr3, # ord; Number of children 13 to 17 (incl. NA)
-  
-  # Combine r0 and r1 with S15r99; impute noanswerS15_r2 later
-  "S15r99" = S15r99, # con; Number of drinks in last 7 days (no 0; incl. NA; combine with below)
-  "noanswerS15_r0" = noanswerS15_r0, # cat; Number of drinks in last 7 days (non-drinkers)
-  "noanswerS15_r1" = noanswerS15_r1, # cat; Number of drinks in last 7 days (less than 1 per week)
-  "noanswerS15_r2" = noanswerS15_r2, # cat; Number of drinks in last 7 days (it depends)
-  
-  # Combine r0 and r1 with S16Cr99
-  "S16Cr99" = S16Cr99, # con; Number of cannabis products in last 7 days (no 0; incl. NA; combine with below)
-  "noanswerS16C_r1" = noanswerS16C_r1, # con; Number of cannabis products (non-users)
-  "noanswerS16C_r2" = noanswerS16C_r2, # con; Number of cannabis products (less than 1 per week)
-  
-  # Combine r0 and r1 with S17Ar99; impute noanswerS17A_r2 later
-  "S17Ar99" = S17Ar99, # con; Number of cigarettes in last 7 days (no 0; incl. NA; combine with below)
-  "noanswerS17A_r0" = noanswerS17A_r0, # con; Number of cigarettes (non-smokers)
-  "noanswerS17A_r1" = noanswerS17A_r1, # con; Number of cigarettes (less than 1 per day)
-  "noanswerS17A_r2" = noanswerS17A_r2, # con; Number of cigarettes (it depends)
-  
-  # Combine r0 and r1 with S17Ar99; impute noanswerS17B_r2 later
-  "S17Br99" = S17Br99, # con; Number of times e-cigarettes used in last 7 days (no 0; incl. NA; combine with below)
-  "noanswerS17B_r0" = noanswerS17B_r0, # con; Number of e-cigarettes (non-users)
-  "noanswerS17B_r1" = noanswerS17B_r1, # con; Number of e-cigarettes (less than 1 per day)
-  "noanswerS17B_r2" = noanswerS17B_r2, # con; Number of e-cigarettes (it depends)
-  
-  # Convert NAs to 0
-  "C1" = C1, # cat; Ever tested for COVID-19 (y/n)
-  "C1AA" = C1AA, # ord; When tested for COVID-19 (incl. NA; convert to 0)
-  "C1B" = C1B, # cat; Type of testing (incl. NA; convert to 0)
-  "C1C" = C1C, # cat; COVID-19 Detected (incl. NA, convert to 0)
-  
-  # Convert NAs to 0
-  "SPQ11A" = SPQ11A, # ord; Exercise frequency
-  "SPQ11B" = SPQ11B, # ord; Leave home to exercise (incl. NA from "never" in SPQ11A)
-  "SPQ11C" = SPQ11C, # ord; Stay close to home (incl. NA from "never" in SPQ11B)
-  
-  # Impute missing values
-  "CVSQ2b" = CVSQ2b, # ord; Government messaging suggest end to social distancing (incl. NA; convert to 0)
-  
-  # All PVDrX are ord and have 1021 NA cases
-  "PVDr1" = PVDr1, # Bothered by people sneezing without covering mouths (incl. NA)
-  "PVDr2" = PVDr2, # If illness going around, I will get it (incl. NA)
-  "PVDr3" = PVDr3, # Comfortable sharing water bottle with friend (incl. NA)
-  "PVDr4" = PVDr4, # Don't like chewed on pencils (incl. NA)
-  "PVDr5" = PVDr5, # Past experience make me believe unlikely to get sick even when friends are (incl. NA)
-  "PVDr6" = PVDr6, # Susceptible to infectious diseases (incl. NA)
-  "PVDr7" = PVDr7, # Wash hands soon after shaking hands (incl. NA)
-  "PVDr8" = PVDr8, # Susceptible to colds, flus, and other infectious diseases (incl. NA)
-  "PVDr9" = PVDr9, # Dislike used clothing because you don't know how past person was like (incl. NA)
-  "PVDr10" = PVDr10, # More likely to catch infectious diseases than others (incl. NA)
-  "PVDr11" = PVDr11, # Hands do not feel dirty after touching money (incl. NA)
-  "PVDr12" = PVDr12, # Unlikely to catch cold, flus, other illness even if going around (incl. NA)
-  "PVDr13" = PVDr13, # Does not make me anxious to be around sick people (incl. NA)
-  "PVDr14" = PVDr14, # Immune system protects me from most illnesses that others get (incl. NA)
-  "PVDr15" = PVDr15, # Avoid public telephones because of risk of catching something from previous user (incl. NA)
-  
-  # SSQrX has 104 NA cases
-  "SSQr1" = SSQr1, # ord; Satisfaction with personal relationships (incl. NA; impute data)
-  "SSQr2" = SSQr2, # ord; Satisfaction with support from friends (incl. NA; impute data)
-  
-  # SDSAQrX are cat vars
-  "SDSAQr1" = SDSAQr1, # Willing to marry East Asian descent (incl. NA)
-  "SDSAQr2" = SDSAQr2, # Willing to accept East Asian as a close personal friend (incl. NA)
-  "SDSAQr3" = SDSAQr3, # Willing to have East Asian as neighbor (incl. NA)
-  "SDSAQr4" = SDSAQr4, # Willing to have East Asian as coworker (incl. NA)
-  "SDSAQr5" = SDSAQr5, # Willing to have East Asian as citizen (incl. NA)
-  "SDSAQr6" = SDSAQr6, # Willing to have East Asian as non-citizen visitor (incl. NA)
-  "SDSAQr7" = SDSAQr7, # Willing to exclude East Asian from visiting country (incl. NA)
-  
-  # SDSEQrX are cat vars
-  "SDSEQr1" = SDSEQr1, # Willing to marry Northern European descent (incl. NA)
-  "SDSEQr2" = SDSEQr2, # Willing to accept Northern European as a close personal friend (incl. NA)
-  "SDSEQr3" = SDSEQr3, # Willing to have cartoon as neighbor (incl. NA)
-  "SDSEQr4" = SDSEQr4, # Willing to have Northern European as coworker (incl. NA)
-  "SDSEQr5" = SDSEQr5, # Willing to have Northern European as citizen (incl. NA)
-  "SDSEQr6" = SDSEQr6, # Willing to have Northern European as non-citizen visitor (incl. NA)
-  "SDSEQr7" = SDSEQr7, # Willing to exclude Northern European from visiting country (incl. NA)
-  
-  "CVSQ8_Q9CVSQ9a" = CVSQ8_Q9CVSQ9a, # ord; COVID-19 affected mental health (incl. NA; impute NA)
-  "CVSQ8_Q9CVSQ9b" = CVSQ8_Q9CVSQ9b, # ord; social distancing affected mental health (incl. NA; impute NA)
-  
-  "Q8AA" = Q8AA # cat; Ever had depression, anxiety, or mental health issues (incl. NA with unknown values)
-  
+vars_dealwithlater <- bind_cols(
+  "Provinces_Canada" = Provinces_Canada  # cat; Province (for Canadian responses, incl. NA for US)
 )
 
 vars_excl <- bind_cols(
-  "Primary_Case" = Primary_Case # Unknown... (incl. NA)
+  "Primary_Case" = Primary_Case,      # Unknown (incl. NA)
+  "C1AA"         = C1AA              # ord; When tested for COVID-19 (incl. 99 for missing; too many NA)
 )
 
-# Let's recover as many of the variables containing NAs and incorporate them
-# back into sensible variables where possible
+# These variables need NAs converted to 0 then combined with vars_cat
+vars_catnom_convertto0 <- bind_cols(
+  "S16B"           = S16B,              # Type of cannabis product (incl. NA)
+  "C1B"            = C1B,               # Type of testing (incl. NA)
+  "C1C"            = C1C                # COVID-19 Detected (incl. NA)
+)
 
-# S6D and S6E concern health care workers. Since all NAs in S6E are those than
-# answered "no" in S6D, we can add a new label to S6E for those that are not
-# health care workers
-coviddata_exclna$S6E_NAlabelled <- S6E %>% labelled(
-  ., 
-  labels = c(attr(., "labels", exact = TRUE), "Not a health care worker" = 2),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$S6E_NAlabelled[is.na(coviddata_exclna$S6E_NAlabelled)] <- 2 
-vars_cat <- bind_cols(
-  vars_cat, 
-  "S6D" = S6D, 
-  "S6E_NAlabelled" = coviddata_exclna$S6E_NAlabelled)
-
-# S7B and S7C concern laid off workers. Since all NAs in S7C are those that
-# answered "no" or "no response" in S7B, we can add them back to their
-# respective label in S7C
-coviddata_exclna$S7C_NAlabelled <- S7C %>% labelled(
-  ., 
-  labels = attr(., "labels", exact = TRUE),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna[which(S7B == 0), "S7C_NAlabelled"] <- 0
-coviddata_exclna[which(S7B == 99), "S7C_NAlabelled"] <- 99
-vars_cat <- bind_cols(
-  vars_cat, 
-  "S7B" = S7B, 
-  "S7C_NAlabelled" = coviddata_exclna$S7C_NAlabelled)
-
-# S16A and S16B concern cannabis use. Since all NAs in S16B are those that have
-# never used cannabis, we can add a new label for non-users.
-coviddata_exclna$S16B_NAlabelled <- S16B %>% labelled(
+S16B <- S16B %>% labelled(
   ., 
   labels = c(attr(., "labels", exact = TRUE), "Not a cannabis/marijuana user" = 0),
   label = attr(., "label", exact = TRUE))
-coviddata_exclna$S16B_NAlabelled[is.na(coviddata_exclna$S16B_NAlabelled)] <- 0
-vars_cat <- bind_cols(
-  vars_cat, 
-  "S16A" = S16A, 
-  "S16B_NAlabelled" = coviddata_exclna$S16B_NAlabelled)
-
-# S6Gr1, S6Gr2, and S6Gr3 all ask about number of children. Since the number of
-# NAs in these variables are constant across variables, let's assume that the
-# NAs represent no children.
-coviddata_exclna$S6Gr1_NAlabelled <- S6Gr1 %>% labelled(
-  ., 
-  labels = attr(., "labels", exact = TRUE),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$S6Gr1_NAlabelled[is.na(coviddata_exclna$S6Gr1_NAlabelled)] <- 0
-coviddata_exclna$S6Gr2_NAlabelled <- S6Gr2 %>% labelled(
-  ., 
-  labels = attr(., "labels", exact = TRUE),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$S6Gr2_NAlabelled[is.na(coviddata_exclna$S6Gr2_NAlabelled)] <- 0
-coviddata_exclna$S6Gr3_NAlabelled <- S6Gr3 %>% labelled(
-  ., 
-  labels = attr(., "labels", exact = TRUE),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$S6Gr3_NAlabelled[is.na(coviddata_exclna$S6Gr3_NAlabelled)] <- 0
-vars_cat <- bind_cols(
-  vars_cat, 
-  "S6Gr1_NAlabelled" = coviddata_exclna$S6Gr1_NAlabelled,
-  "S6Gr2_NAlabelled" = coviddata_exclna$S6Gr2_NAlabelled,
-  "S6Gr3_NAlabelled" = coviddata_exclna$S6Gr3_NAlabelled
-)
-
-# S15r99, noanswerS15_r0, noanswerS15_r1, and noanswerS15_r2 concern alcohol
-# use. Since all NAs in S15r99 are those that "never drink" or drink "less than
-# once per week", let's assume these people do not drink. Meanwhile, we should
-# impute values for those that answered "it depends". We'll perform the
-# imputation later.
-coviddata_exclna$S15r99_NAlabelled <- S15r99 %>% labelled(
-  .,
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna[which(noanswerS15_r0 == 1), "S15r99_NAlabelled"] <- 0
-coviddata_exclna[which(noanswerS15_r1 == 1), "S15r99_NAlabelled"] <- 0
-vars_cat <- bind_cols(
-  vars_cat,
-  "noanswerS15_r0" = noanswerS15_r0,
-  "noanswerS15_r1" = noanswerS15_r1,
-  "noanswerS15_r2" = noanswerS15_r2
-)
-vars_con <- bind_cols(
-  vars_con,
-  "S15r99_NAlabelled" = coviddata_exclna$S15r99_NAlabelled
-)
-
-# S16Cr99, noanswerS16C_r1, and noanswerS16C_r2 concern cannabis use. Since all
-# NAs in S16Cr99 are those that "never use" or use "less than once per week",
-# let's assume these people do not use.
-coviddata_exclna$S16Cr99_NAlabelled <- S16Cr99 %>% labelled(
-  .,
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna[which(noanswerS16C_r1 == 1), "S16Cr99_NAlabelled"] <- 0
-coviddata_exclna[which(noanswerS16C_r2 == 1), "S16Cr99_NAlabelled"] <- 0
-vars_cat <- bind_cols(
-  vars_cat,
-  "noanswerS16C_r1" = noanswerS16C_r1,
-  "noanswerS16C_r2" = noanswerS16C_r2
-)
-vars_con <- bind_cols(
-  vars_con,
-  "S16Cr99_NAlabelled" = coviddata_exclna$S16Cr99_NAlabelled
-)
-
-# S17Ar99, noanswerS17A_r0, noanswerS17A_r1, and noanswerS17A_r2 concern cigarette
-# use. Since all NAs in S17Ar99 are those that "never smoke" or smoke "less than
-# once per week", let's assume these people do not smoke Meanwhile, we should
-# impute values for those that answered "it depends". We'll perform the
-# imputation later.
-coviddata_exclna$S17Ar99_NAlabelled <- S17Ar99 %>% labelled(
-  .,
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna[which(noanswerS17A_r0 == 1), "S17Ar99_NAlabelled"] <- 0
-coviddata_exclna[which(noanswerS17A_r1 == 1), "S17Ar99_NAlabelled"] <- 0
-vars_cat <- bind_cols(
-  vars_cat,
-  "noanswerS17A_r0" = noanswerS17A_r0,
-  "noanswerS17A_r1" = noanswerS17A_r1,
-  "noanswerS17A_r2" = noanswerS17A_r2
-)
-vars_con <- bind_cols(
-  vars_con,
-  "S17Ar99_NAlabelled" = coviddata_exclna$S17Ar99_NAlabelled
-)
-
-# S17Br99, noanswerS17B_r0, noanswerS17B_r1, and noanswerS17B_r2 concern cigarette
-# use. Since all NAs in S17Br99 are those that "never smoke" or smoke "less than
-# once per week", let's assume these people do not smoke Meanwhile, we should
-# impute values for those that answered "it depends". We'll perform the
-# imputation later.
-coviddata_exclna$S17Br99_NAlabelled <- S17Br99 %>% labelled(
-  .,
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna[which(noanswerS17B_r0 == 1), "S17Br99_NAlabelled"] <- 0
-coviddata_exclna[which(noanswerS17B_r1 == 1), "S17Br99_NAlabelled"] <- 0
-vars_cat <- bind_cols(
-  vars_cat,
-  "noanswerS17B_r0" = noanswerS17B_r0,
-  "noanswerS17B_r1" = noanswerS17B_r1,
-  "noanswerS17B_r2" = noanswerS17B_r2
-)
-vars_con <- bind_cols(
-  vars_con,
-  "S17Br99_NAlabelled" = coviddata_exclna$S17Br99_NAlabelled
-)
-
-# C1, C1AA, C1B, and C1C ask about COVID-19 testing. Since all NAs are those
-# that answered "no" to C1, we can replace the NAs with sensible values.
-coviddata_exclna$C1AA_NAlabelled <- C1AA %>% labelled(
-  ., 
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$C1AA_NAlabelled[is.na(coviddata_exclna$C1AA_NAlabelled)] <- 0
-coviddata_exclna$C1AA_NAlabelled[which(coviddata_exclna$C1AA_NAlabelled == 99)] <- 0
-coviddata_exclna$C1B_NAlabelled <- C1B %>% labelled(
+S16B[is.na(S16B)] <- 0
+C1B <- C1B %>% labelled(
   ., 
   labels = c(attr(., "labels", exact = TRUE), "Not tested" = 0),
   label = attr(., "label", exact = TRUE))
-coviddata_exclna$C1B_NAlabelled[is.na(coviddata_exclna$C1B_NAlabelled)] <- 0
-coviddata_exclna$C1C_NAlabelled <- C1C %>% labelled(
+C1B[is.na(C1B)] <- 0
+C1C <- C1C %>% labelled(
   ., 
   labels = c(attr(., "labels", exact = TRUE), "Not tested" = 0),
   label = attr(., "label", exact = TRUE))
-coviddata_exclna$C1C_NAlabelled[is.na(coviddata_exclna$C1C_NAlabelled)] <- 0
+C1C[is.na(C1C)] <- 0
 vars_cat <- bind_cols(
   vars_cat, 
-  "C1" = C1,
-  "C1B_NAlabelled" = coviddata_exclna$C1B_NAlabelled, 
-  "C1C_NAlabelled" = coviddata_exclna$C1C_NAlabelled)
-vars_ord <- bind_cols(
-  vars_ord, 
-  "C1AA_NAlabelled" = coviddata_exclna$C1AA_NAlabelled)
+  "S16B" = S16B,
+  "C1B" = C1B,
+  "C1C" = C1C)
 
-# SPQ11A, SPQ11B, and SPQ11C ask about exercise frequency. Since all NAs in B
-# and C are those that answered "no" to A, we can replace the NAs with 0.
-coviddata_exclna$SPQ11B_NAlabelled <- SPQ11B %>% labelled(
-  ., 
-  labels = c(attr(., "labels", exact = TRUE), "Do not exercise" = 0),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$SPQ11B_NAlabelled[is.na(coviddata_exclna$SPQ11B_NAlabelled)] <- 0 
-coviddata_exclna$SPQ11C_NAlabelled <- SPQ11C %>% labelled(
-  ., 
-  labels = c(attr(., "labels", exact = TRUE), "Do not exercise" = 0),
-  label = attr(., "label", exact = TRUE))
-coviddata_exclna$SPQ11C_NAlabelled[is.na(coviddata_exclna$SPQ11C_NAlabelled)] <- 0 
-vars_ord <- bind_cols(
-  vars_ord, 
-  "SPQ11A" = SPQ11A,
-  "SPQ11B_NAlabelled" = coviddata_exclna$SPQ11B_NAlabelled,
-  "SPQ11C_NAlabelled" = coviddata_exclna$SPQ11C_NAlabelled)
+# These variables need to be passed through mice to impute NA values
+vars_catbin_NA <- bind_cols(
+  # Categorical variables; impute with logreg for binary 
+  "S6E"            = S6E,               # Hospital or long-term care worker (y/n/NA)
+  "S7C"            = S7C,               # Temporarily or permanently laid off (y/n/NA)
+  "SDSAQr1"        = SDSAQr1,           # Willing to marry East Asian descent (y/n/NA)
+  "SDSAQr2"        = SDSAQr2,           # Willing to accept East Asian as a close personal friend (y/n/NA)
+  "SDSAQr3"        = SDSAQr3,           # Willing to have East Asian as neighbor (y/n/NA)
+  "SDSAQr4"        = SDSAQr4,           # Willing to have East Asian as coworker (y/n/NA)
+  "SDSAQr5"        = SDSAQr5,           # Willing to have East Asian as citizen (y/n/NA)
+  "SDSAQr6"        = SDSAQr6,           # Willing to have East Asian as non-citizen visitor (y/n/NA)
+  "SDSAQr7"        = SDSAQr7,           # Willing to exclude East Asian from visiting country (y/n/NA)
+  "SDSEQr1"        = SDSEQr1,           # Willing to marry Northern European descent (y/n/NA)
+  "SDSEQr2"        = SDSEQr2,           # Willing to accept Northern European as a close personal friend (y/n/NA)
+  "SDSEQr3"        = SDSEQr3,           # Willing to have cartoon as neighbor (y/n/NA)
+  "SDSEQr4"        = SDSEQr4,           # Willing to have Northern European as coworker (y/n/NA)
+  "SDSEQr5"        = SDSEQr5,           # Willing to have Northern European as citizen (y/n/NA)
+  "SDSEQr6"        = SDSEQr6,           # Willing to have Northern European as non-citizen visitor (y/n/NA)
+  "SDSEQr7"        = SDSEQr7            # Willing to exclude Northern European from visiting country (y/n/NA)
+)
 
-# CVSQ2b 
+# These variables need to be passed through mice to impute NA values
+# There are no categorical unordered variables with NA values that do not need conversion...
+# vars_catnom_NA <- bind_cols(
+#   
+# )
+
+# These variables need to be passed through mice to impute NA values
+vars_ord_NA <- bind_cols(
+  # Ordinal variables; impute with polr for ordered
+  "SPQ11B"         = SPQ11B,            # Leave home to exercise (incl. NA)
+  "SPQ11C"         = SPQ11C,            # Stay close to home (incl. NA)
+  "CVSQ2b"         = CVSQ2b,            # Government messaging suggest end to social distancing (incl. NA)
+  "PVDr1"          = PVDr1,             # Bothered by people sneezing without covering mouths (incl. NA)
+  "PVDr2"          = PVDr2,             # If illness going around, I will get it (incl. NA)
+  "PVDr3"          = PVDr3,             # Comfortable sharing water bottle with friend (incl. NA)
+  "PVDr4"          = PVDr4,             # Don't like chewed on pencils (incl. NA)
+  "PVDr5"          = PVDr5,             # Past experience make me believe unlikely to get sick even when friends are (incl. NA)
+  "PVDr6"          = PVDr6,             # Susceptible to infectious diseases (incl. NA)
+  "PVDr7"          = PVDr7,             # Wash hands soon after shaking hands (incl. NA)
+  "PVDr8"          = PVDr8,             # Susceptible to colds, flus, and other infectious diseases (incl. NA)
+  "PVDr9"          = PVDr9,             # Dislike used clothing because you don't know how past person was like (incl. NA)
+  "PVDr10"         = PVDr10,            # More likely to catch infectious diseases than others (incl. NA)
+  "PVDr11"         = PVDr11,            # Hands do not feel dirty after touching money (incl. NA)
+  "PVDr12"         = PVDr12,            # Unlikely to catch cold, flus, other illness even if going around (incl. NA)
+  "PVDr13"         = PVDr13,            # Does not make me anxious to be around sick people (incl. NA)
+  "PVDr14"         = PVDr14,            # Immune system protects me from most illnesses that others get (incl. NA)
+  "PVDr15"         = PVDr15,            # Avoid public telephones because of risk of catching something from previous user (incl. NA)
+  "SSQr1"          = SSQr1,             # Satisfaction with personal relationships (incl. NA)
+  "SSQr2"          = SSQr2,             # Satisfaction with support from friends (incl. NA)
+  "CVSQ8_Q9CVSQ9a" = CVSQ8_Q9CVSQ9a,    # COVID-19 affected mental health (incl. NA)
+  "CVSQ8_Q9CVSQ9b" = CVSQ8_Q9CVSQ9b     # social distancing affected mental health (incl. NA)
+)
+
+# These variables need to be passed through mice to impute NA values
+vars_con_NA <- bind_cols(
+  # Continuous variables; impute with pmm for numeric
+  "S6Fr1"          = S6Fr1,             # Number living in household (incl. NA)
+  "S6Gr1"          = S6Gr1,             # Number of children under 6 (incl. NA)
+  "S6Gr2"          = S6Gr2,             # Number of children 6 to 12 (incl. NA)
+  "S6Gr3"          = S6Gr3              # Number of children 13 to 17 (incl. NA)
+)
 
 
+# These variables need SOME NAs converted to 0 then combined with vars_con_NA
+vars_con_convertto0andNA <- bind_cols(
+  # Combine noanswerS15_r0 and noanswerS15_r1 with S15r99; impute noanswerS15_r2 with pmm for numeric
+  "S15r99" = S15r99,   # con; Number of drinks in last 7 days (incl. NA; convert NA from r0 and r1 to 0)
+  
+  # Combine noanswerS16C_r1 with S16Cr99; impute noanswerS16C_r2 with pmm for numeric
+  "S16Cr99" = S16Cr99, # con; Number of cannabis products in last 7 days (incl. NA; convert NA from r0 and r1 to 0)
+  
+  # Combine noanswerS17A_r0 and noanswerS17A_r1 with S17Ar99; impute noanswerS17A_r2 with pmm for numeric
+  "S17Ar99" = S17Ar99, # con; Number of cigarettes in last 7 days (incl. NA; convert NA from r0 and r1 to 0)
+  
+  # Combine noanswerS17B_r0 and noanswerS17B_r1 with S17Ar99; impute noanswerS17B_r2 with pmm for numeric
+  "S17Br99" = S17Br99  # con; Number of times e-cigarettes used in last 7 days (incl. NA; convert NA from r0 and r1 to 0)
+)
 
-# S11A and S11C ask about parents' level of education. It would be nice to use
-# these variables as ordinals, but the "don't know" category won't work for
-# ordinal analysis. One option is to use "multiple imputation". 
+S15r99[which(noanswerS15_r0 == 1)] <- 0
+S15r99[which(noanswerS15_r1 == 1)] <- 0
+S16Cr99[which(noanswerS16C_r1 == 1)] <- 0
+S17Ar99[which(noanswerS17A_r0 == 1)] <- 0
+S17Ar99[which(noanswerS17A_r1 == 1)] <- 0
+S17Br99[which(noanswerS17B_r0 == 1)] <- 0
+S17Br99[which(noanswerS17B_r1 == 1)] <- 0
+vars_con_NA <- bind_cols(
+  vars_con_NA,
+  "S15r99" = S15r99,
+  "S16Cr99" = S16Cr99,
+  "S17Ar99" = S17Ar99,
+  "S17Br99" = S17Br99
+)
 
 
+# Variables below contain non-valid answers that need to be converted for imputation
+
+# These variables need non-valid answers converted to NA then combined with vars_cat_NA
+vars_catbin_converttoNA <- bind_cols(
+  # Categorical variables; binary
+  "S8D"         = S8D,              # Received government stimulus (y/n/"rather not say")
+  "S8F"         = S8F,              # Received employment insurance (y/n/"rather not say")
+  "C2"          = C2,               # Close contact of COVID-19 (y/n/"unsure")
+  "S7B"         = S7B               # Laid off because of COVID-19 (y/n/"rather not say")
+)
+
+S8D[which(S8D == 99)] <- NA
+S8F[which(S8F == 99)] <- NA
+C2[which(C2 == 3)] <- NA
+S7B[which(S7B == 99)] <- NA
+vars_catbin_NA <- bind_cols(
+  vars_catbin_NA,
+  "S8D"         = S8D,
+  "S8F"         = S8F,
+  "C2"          = C2, 
+  "S7B"         = S7B 
+)
+
+# These variables need non-valid answers converted to NA then combined with vars_catnom_NA
+vars_catnom_converttoNA <- bind_cols(
+  # Categorical variables; unordered
+  "S3"          = S3,               # Gender (incl. other/prefer not to answer/rather not say; NB non-Male and non-Female answers have very low samples so combine with others)
+  "S4"          = S4,               # Racial or ethnic group (incl. "rather not say")
+  "S5"          = S5,               # Religion (incl. "rather not say")
+  "S6B"         = S6B,              # Type of dwelling (incl. "rather not say")
+  "S7A"         = S7A,              # Employment status (incl. "rather not say")
+  "Q8AA"        = Q8AA              # Ever had depression, anxiety, or mental health issues (incl. NA with unknown values; convert 4 to NA)
+)
+
+S3[-which(S3 %in% c(1,2))] <- NA
+S4[which(S4 == 99)] <- NA
+S5[which(S5 == 99)] <- NA
+S6B[which(S6B == 99)] <- NA
+S7A[which(S7A == 99)] <- NA
+Q8AA[which(Q8AA == 4)] <- NA
+vars_catnom_NA <- bind_cols(
+  "S3"          = S3, 
+  "S4"          = S4, 
+  "S5"          = S5, 
+  "S6B"         = S6B,
+  "S7A"         = S7A,
+  "Q8AA"        = Q8AA
+)
+
+# These variables need non-valid answers converted to NA then combined with vars_ord_NA
+vars_ord_converttoNA <- bind_cols(
+  # Ordinal variables; ordered
+  "S11A"        = S11A,             # Father's level of education (incl. "don't know")
+  "S11C"        = S11C,             # Mother's level of education (incl. "don't know")
+  "S1B"         = S1B,              # Population of area (incl. NA and "don't know")
+  "S6H"         = S6H               # Household income (incl. no-responses)
+
+)
+
+S11A[which(S11A == 99)] <- NA
+S11C[which(S11C == 99)] <- NA
+S1B[which(S1B == 5)] <- NA
+S6H[which(S6H == 99)] <- NA
+vars_ord_NA <- bind_cols(
+  vars_ord_NA,
+  "S11A"        = S11A,
+  "S11C"        = S11C,
+  "S1B"         = S1B, 
+  "S6H"         = S6H  
+)
 
 message("./scripts/01_loaddata.R was executed.")
