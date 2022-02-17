@@ -10,7 +10,7 @@ message("./R/functions.R is loaded.")
 
 # List of required packages for analysis
 required_packages <-
-  c(
+  c("remotes",
     "dataverse",
     "mice",
     "knitr",
@@ -23,6 +23,17 @@ required_packages <-
 
 # Check, install, and load required packages
 using(required_packages)
+
+# Install and load custom github packages
+remotes::install_github("derekbeaton/ExPosition1/ExPosition")
+remotes::install_github("derekbeaton/GSVD")
+remotes::install_github("derekbeaton/OuRS/OuRS")
+remotes::install_github("derekbeaton/GPLS/Package")
+library(ExPosition)
+library(GSVD)
+library(GPLS)
+library(ours)
+
 
 message("./scripts/00_init.R was executed.")
 
