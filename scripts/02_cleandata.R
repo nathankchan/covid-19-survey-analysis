@@ -109,8 +109,6 @@ vars_cat <- bind_cols(
   "noanswerS15_r1"  = noanswerS15_r1,   # cat; Number of drinks in last 7 days (less than 1 per week)
   "noanswerS15_r2"  = noanswerS15_r2,   # cat; Number of drinks in last 7 days (it depends)
   "S16A"            = S16A,             # Use of cannabis products (combine with below)
-  "noanswerS16C_r1" = noanswerS16C_r1,  # cat; Number of cannabis products (less than 1 per day)
-  "noanswerS16C_r2" = noanswerS16C_r2,  # cat; Number of cannabis products (it depends)
   "noanswerS17A_r0" = noanswerS17A_r0,  # cat; Number of cigarettes (non-smokers)
   "noanswerS17A_r1" = noanswerS17A_r1,  # cat; Number of cigarettes (less than 1 per day)
   "noanswerS17A_r2" = noanswerS17A_r2,  # con; Number of cigarettes (it depends)
@@ -305,16 +303,34 @@ vars_excl <- bind_cols(
 
 # These variables need NAs converted to 0 then combined with vars_cat
 vars_catnom_convertto0 <- bind_cols(
+  "S6E"            = S6E,               # Hospital or long-term care worker (y/n/NA)
   "S16B"           = S16B,              # Type of cannabis product (incl. NA)
+  "noanswerS16C_r1" = noanswerS16C_r1,  # cat; Number of cannabis products (less than 1 per day; incl. NA)
+  "noanswerS16C_r2" = noanswerS16C_r2,  # cat; Number of cannabis products (it depends; incl. NA)
   "C1B"            = C1B,               # Type of testing (incl. NA)
   "C1C"            = C1C                # COVID-19 Detected (incl. NA)
 )
 
+S6E <- S6E %>% labelled(
+  ., 
+  labels = c(attr(., "labels", exact = TRUE), "Not a health care worker" = 2),
+  label = attr(., "label", exact = TRUE))
+S6E[is.na(S6E)] <- 2
 S16B <- S16B %>% labelled(
   ., 
   labels = c(attr(., "labels", exact = TRUE), "Not a cannabis/marijuana user" = 0),
   label = attr(., "label", exact = TRUE))
 S16B[is.na(S16B)] <- 0
+noanswerS16C_r1 <- noanswerS16C_r1 %>% labelled(
+  ., 
+  labels = c(attr(., "labels", exact = TRUE), "Not a cannabis/marijuana user" = 2),
+  label = attr(., "label", exact = TRUE))
+noanswerS16C_r1[is.na(noanswerS16C_r1)] <- 2
+noanswerS16C_r2 <- noanswerS16C_r2 %>% labelled(
+  ., 
+  labels = c(attr(., "labels", exact = TRUE), "Not a cannabis/marijuana user" = 2),
+  label = attr(., "label", exact = TRUE))
+noanswerS16C_r2[is.na(noanswerS16C_r2)] <- 2
 C1B <- C1B %>% labelled(
   ., 
   labels = c(attr(., "labels", exact = TRUE), "Not tested" = 0),
@@ -327,15 +343,16 @@ C1C <- C1C %>% labelled(
 C1C[is.na(C1C)] <- 0
 vars_cat <- bind_cols(
   vars_cat, 
+  "S6E" = S6E,
   "S16B" = S16B,
+  "noanswerS16C_r1" = noanswerS16C_r1,
+  "noanswerS16C_r2" = noanswerS16C_r2,
   "C1B" = C1B,
   "C1C" = C1C)
 
 # These variables need to be passed through mice to impute NA values
 vars_catbin_NA <- bind_cols(
   # Categorical variables; impute with logreg for binary 
-  "S6E"            = S6E,               # Hospital or long-term care worker (y/n/NA)
-  "S7C"            = S7C,               # Temporarily or permanently laid off (y/n/NA)
   "SDSAQr1"        = SDSAQr1,           # Willing to marry East Asian descent (y/n/NA)
   "SDSAQr2"        = SDSAQr2,           # Willing to accept East Asian as a close personal friend (y/n/NA)
   "SDSAQr3"        = SDSAQr3,           # Willing to have East Asian as neighbor (y/n/NA)
@@ -394,6 +411,17 @@ vars_con_NA <- bind_cols(
   "S6Gr3"          = S6Gr3              # Number of children 13 to 17 (incl. NA)
 )
 
+# These variables need SOME NAs converted to 0 then combined with vars_con_NA
+vars_catnom_convertto0andNA <- bind_cols(
+  # Convert NA to 0 then convert 99 to NA
+  "S7C"            = S7C,               # Temporarily or permanently laid off (y/n/NA)
+)
+
+S7C[is.na(S7C)] <- 0
+S7C[which(S7C == 99)] <- NA
+vars_catnom_NA <- bind_cols(
+  "S7C" = S7C
+)
 
 # These variables need SOME NAs converted to 0 then combined with vars_con_NA
 vars_con_convertto0andNA <- bind_cols(
@@ -410,8 +438,10 @@ vars_con_convertto0andNA <- bind_cols(
   "S17Br99" = S17Br99  # con; Number of times e-cigarettes used in last 7 days (incl. NA; convert NA from r0 and r1 to 0)
 )
 
+
 S15r99[which(noanswerS15_r0 == 1)] <- 0
 S15r99[which(noanswerS15_r1 == 1)] <- 0
+S16Cr99[which(S16A == 0)] <- 0
 S16Cr99[which(noanswerS16C_r1 == 1)] <- 0
 S17Ar99[which(noanswerS17A_r0 == 1)] <- 0
 S17Ar99[which(noanswerS17A_r1 == 1)] <- 0
@@ -467,6 +497,7 @@ S6B[which(S6B == 99)] <- NA
 S7A[which(S7A == 99)] <- NA
 Q8AA[which(Q8AA == 4)] <- NA
 vars_catnom_NA <- bind_cols(
+  vars_catnom_NA,
   "S3"          = S3, 
   "S4"          = S4, 
   "S5"          = S5, 
@@ -482,7 +513,6 @@ vars_ord_converttoNA <- bind_cols(
   "S11C"        = S11C,             # Mother's level of education (incl. "don't know")
   "S1B"         = S1B,              # Population of area (incl. NA and "don't know")
   "S6H"         = S6H               # Household income (incl. no-responses)
-
 )
 
 S11A[which(S11A == 99)] <- NA
@@ -497,4 +527,147 @@ vars_ord_NA <- bind_cols(
   "S6H"         = S6H  
 )
 
-message("./scripts/01_loaddata.R was executed.")
+# For each of the vars_X_NA, we need to impute the NA values. We can use the
+# mice package to do this!
+
+haven_binarize_yesno <- function(x) {
+  a <- as_factor(x) %>% as.character()
+  a[which(a == "No")] <- 0
+  a[which(a == "Yes")] <- 1
+  a <- as.numeric(a)
+  return(a)
+}
+
+haven_ordered <- function(x) {
+  a <- as_factor(x, ordered = TRUE, levels = "values")
+  return(a)
+}
+
+
+# Prep datasets for each imputation
+
+data_preimpute <- bind_cols(
+  vars_cat %>% mutate(across(everything(), as_factor)),
+  vars_ord %>% mutate(across(everything(), haven_ordered)),
+  vars_con
+)
+
+data_preimpute_catbin_NA <- bind_cols(
+  data_preimpute,
+  vars_catbin_NA %>% mutate(across(everything(), as_factor))
+) %>% zap_labels()
+
+data_preimpute_catnom_NA <- bind_cols(
+  data_preimpute,
+  vars_catnom_NA %>% mutate(across(everything(), as_factor))
+) %>% zap_labels()
+
+data_preimpute_ord_NA <- bind_cols(
+  data_preimpute,
+  vars_ord_NA %>% mutate(across(everything(), haven_ordered))
+  # vars_con_NA
+) %>% zap_labels()
+
+data_preimpute_con_NA <- bind_cols(
+  data_preimpute,
+  vars_con_NA
+) %>% zap_labels()
+
+
+# Check if data set has already been imputed and is unchanged; otherwise, redo
+
+if (file.exists(paste0(getwd(), "/output/data_impute_catbin_NA.RDS"))) {
+  data_check <- readRDS(file = paste0(getwd(), "/output/data_impute_catbin_NA.RDS"))
+} else {
+  data_check <- NULL
+}
+
+if (setequal(data_check$data, data_preimpute_catbin_NA)) {
+  data_impute_catbin_NA <- data_check
+} else {
+  data_impute_catbin_NA <- mice(
+    data = data_preimpute_catbin_NA,
+    nnet.MaxNWts = 50000,
+    seed = 1
+  )
+  saveRDS(object = data_impute_catbin_NA, 
+          file = paste0(getwd(), "/output/data_impute_catbin_NA.RDS"))
+}
+
+if (file.exists(paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))) {
+  data_check <- readRDS(file = paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))
+} else {
+  data_check <- NULL
+}
+
+if (setequal(data_check$data, data_preimpute_catnom_NA)) {
+  data_impute_catnom_NA <- data_check
+} else {
+  data_impute_catnom_NA <- mice(
+    data = data_preimpute_catnom_NA,
+    nnet.MaxNWts = 50000,
+    seed = 1
+  )
+  
+  saveRDS(object = data_impute_catnom_NA, 
+          file = paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))
+}
+
+if (file.exists(paste0(getwd(), "/output/data_impute_ord_NA.RDS"))) {
+  data_check <- readRDS(file = paste0(getwd(), "/output/data_impute_ord_NA.RDS"))
+} else {
+  data_check <- NULL
+}
+
+if (setequal(data_check$data, data_preimpute_ord_NA)) {
+  data_impute_ord_NA <- data_check
+} else {
+  data_impute_ord_NA <- mice(
+    data = data_preimpute_ord_NA,
+    nnet.MaxNWts = 50000,
+    seed = 1
+  )
+  
+  saveRDS(object = data_impute_ord_NA, 
+          file = paste0(getwd(), "/output/data_impute_ord_NA.RDS"))
+}
+
+if (file.exists(paste0(getwd(), "/output/data_impute_con_NA.RDS"))) {
+  data_check <- readRDS(file = paste0(getwd(), "/output/data_impute_con_NA.RDS"))
+} else {
+  data_check <- NULL
+}
+
+if (setequal(data_check$data, data_preimpute_con_NA)) {
+  data_impute_con_NA <- data_check
+} else {
+  data_impute_con_NA <- mice(
+    data = data_preimpute_con_NA,
+    nnet.MaxNWts = 50000,
+    seed = 1
+  )
+  
+  saveRDS(object = data_impute_con_NA, 
+          file = paste0(getwd(), "/output/data_impute_con_NA.RDS"))
+}
+
+data_complete <- left_join(
+  x = complete(data_impute_catbin_NA),
+  y = complete(data_impute_catnom_NA),
+  by = names(data_preimpute)
+)
+
+data_complete <- left_join(
+  x = data_complete,
+  y = complete(data_impute_ord_NA),
+  by = names(data_preimpute)
+)
+
+data_complete <- left_join(
+  x = data_complete,
+  y = complete(data_impute_con_NA),
+  by = names(data_preimpute)
+)
+
+
+message("./scripts/02_cleandata.R was executed.")
