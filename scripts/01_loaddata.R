@@ -20,6 +20,12 @@ source(paste0(getwd(), "/scripts/00_init.R"))
 # )
 
 # If connection refused, load data from local download
-coviddata <- haven::read_sav(file = "./data/COVID-19 Behavior Determinants Database_v1.0.sav")
+# coviddata <- haven::read_sav(file = "./data/COVID-19 Behavior Determinants Database_v1.0.sav")
+
+if (file.exists(paste0(getwd(), "/output/coviddata.RDS"))) {
+  coviddata <- readRDS(file = paste0(getwd(), "/output/coviddata.RDS"))
+} else {
+  coviddata <- haven::read_sav(file = "./data/COVID-19 Behavior Determinants Database_v1.0.sav")
+}
 
 message("./scripts/01_loaddata.R was executed.")
