@@ -669,5 +669,92 @@ data_complete <- left_join(
   by = names(data_preimpute)
 )
 
+detach(coviddata_exclNA)
+
+# Save out objects required for analysis, then clean up the environment
+
+coviddata_imp <- data_complete
+datadict_imp <- datadict[names(data_complete)]
+vars_imp <- list(
+  cat = c(names(vars_cat),
+          names(vars_catbin_NA),
+          names(vars_catnom_NA)),
+  con = c(names(vars_con),
+          names(vars_con_NA)),
+  ord = c(names(vars_ord),
+          names(vars_ord_NA))
+)
+
+write_csv(data_complete, file = paste0(getwd(), "/output/data_imputed.csv"))
+
+rm(
+  C1B,
+  C1C,
+  C2,
+  coviddata,
+  coviddata_exclNA,
+  # coviddata_imp,
+  coviddata_num,
+  data_check,
+  data_complete,
+  data_impute_catbin_NA,
+  data_impute_catnom_NA,
+  data_impute_con_NA,
+  data_impute_ord_NA,
+  data_preimpute,
+  data_preimpute_catbin_NA,
+  data_preimpute_catnom_NA,
+  data_preimpute_con_NA,
+  data_preimpute_ord_NA,
+  datadict,
+  datadict_exclNA,
+  # datadict_imp,
+  haven_binarize_yesno,
+  haven_ordered,
+  noanswerS16C_r1,
+  noanswerS16C_r2,
+  Q8AA,
+  # required_packages,
+  S11A,
+  S11C,
+  S15r99,
+  S16B,
+  S16Cr99,
+  S17Ar99,
+  S17Br99,
+  S1B,
+  S3,
+  S4,
+  S5,
+  S6B,
+  S6E,
+  S6H,
+  S7A,
+  S7B,
+  S7C,
+  S8D,
+  S8F,
+  # using,
+  vars_cat,
+  vars_catbin_converttoNA,
+  vars_catbin_NA,
+  vars_catnom_convertto0,
+  vars_catnom_convertto0andNA,
+  vars_catnom_converttoNA,
+  vars_catnom_NA,
+  vars_con,
+  vars_con_convertto0andNA,
+  vars_con_NA,
+  vars_dealwithlater,
+  vars_excl,
+  # vars_imp,
+  vars_na1,
+  vars_na2,
+  vars_na3,
+  vars_naall,
+  vars_ord,
+  vars_ord_converttoNA,
+  vars_ord_NA
+)
 
 message("./scripts/02_cleandata.R was executed.")
