@@ -19,17 +19,20 @@ required_packages <-
     "haven",
     "plotly",
     "htmlwidgets",
-    "shiny")
+    "shiny",
+    "colorspace")
 
 # Check, install, and load required packages
 using(required_packages)
 
 # Install and load custom github packages
-remotes::install_github("derekbeaton/ExPosition1/ExPosition")
-remotes::install_github("derekbeaton/GSVD")
-remotes::install_github("derekbeaton/OuRS/OuRS")
-remotes::install_github("derekbeaton/GPLS/Package")
+# remotes::install_github("derekbeaton/ExPosition1/ExPosition")
+# remotes::install_github("derekbeaton/ExPosition1/TExPosition")
+# remotes::install_github("derekbeaton/GSVD")
+# remotes::install_github("derekbeaton/OuRS/OuRS")
+# remotes::install_github("derekbeaton/GPLS/Package")
 library(ExPosition)
+library(TExPosition)
 library(GSVD)
 library(GPLS)
 library(ours)
