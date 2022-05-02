@@ -610,4 +610,4 @@ plsca_panas <- run.PLSCA(
 
 
 
-message("./scripts/04_outliers.R was executed.")
+message("./scripts/04_outliers.R was executed")

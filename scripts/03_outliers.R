@@ -62,7 +62,7 @@ if (file.exists(paste0(getwd(), "/output/mcd_results.RDS"))) {
           file = paste0(getwd(), "/output/mcd_results.RDS"))
 }
 
-if (file.exists(paste0(getwd(), "/output/mcd_results.RDS"))) {
+if (file.exists(paste0(getwd(), "/output/mcd_corrmax.RDS"))) {
   mcd_corrmax <- readRDS(file = paste0(getwd(), "/output/mcd_corrmax.RDS"))
 } else {
   mcd_corrmax <- generalized_corrmax(as.matrix(mcd_data), mcd_results$cov$loadings, mcd_results$cov$singular.values)
@@ -196,5 +196,5 @@ if (file.exists(paste0(getwd(), "/output/outlier_stats.RDS"))) {
 # rm(md_plot_data,
 #    corr_plot_data)
 
-message("./scripts/03_analyze.R was executed.")
+message("./scripts/03_analyze.R was executed")
 
