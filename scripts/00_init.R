@@ -12,6 +12,7 @@ message("./R/functions.R is loaded.")
 required_packages <-
   c("remotes",
     "dataverse",
+    "plot.matrix",
     "mice",
     "knitr",
     "kableExtra",
@@ -31,12 +32,41 @@ using(required_packages)
 # remotes::install_github("derekbeaton/GSVD")
 # remotes::install_github("derekbeaton/OuRS/OuRS")
 # remotes::install_github("derekbeaton/GPLS/Package")
-library(ExPosition)
-library(TExPosition)
-library(GSVD)
-library(GPLS)
-library(ours)
+# library(ExPosition)
+# library(TExPosition)
+# library(GSVD)
+# library(GPLS)
+# library(ours)
 
+github_packages <-
+  c("ExPosition",
+    "TExPosition",
+    "GSVD",
+    "GPLS",
+    "ours"
+  )
 
-message("./scripts/00_init.R was executed.")
+github_repos <- 
+  c("derekbeaton/ExPosition1/ExPosition",
+    "derekbeaton/ExPosition1/TExPosition",
+    "derekbeaton/GSVD",
+    "derekbeaton/OuRS/OuRS",
+    "derekbeaton/GPLS/Package"
+  )
+
+using_github(libs = github_packages, repos = github_repos)
+
+missing_packages <- 
+  !(paste0("package:", c(required_packages, github_packages)) %in% search())
+
+if (any(missing_packages)) {
+  missing_packages <- c(required_packages, github_packages)[which(missing_packages)]
+  missing_msg <- paste0("Required packages could not be loaded. Please ensure all required packages are installed and loadable, then re-run this script (00_init.R) before moving to the next step. \n\r\n\rThe required packages that were not loaded include: '", paste0(c(missing_packages), sep = "'", collapse = ", '"))
+  stop(missing_msg)
+} else {
+  rm(missing_packages)
+  message("All required packages are loaded")
+}
+
+message("./scripts/00_init.R was executed")
 
