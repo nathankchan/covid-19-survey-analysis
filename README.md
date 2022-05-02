@@ -24,10 +24,8 @@ Please note that this project is currently under development.
 The project contains several parts:
 
 1. a series of **R Markdown documents**, to guide readers through the project's analysis pipeline and interpretations, including:
-
-  1. [**Part 1: Introduction**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part1.html)
-  2. [**Part 2: Data Extraction & Preprocessing**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part2.html)
-  3. [**Part 3: Outlier Analysis**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part3.html) (*under construction*)
-  4. [**Part 4: Inferential Analysis**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part4.html) (*under construction*)
-
+   * [**Part 1: Introduction**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part1.html);
+   * [**Part 2: Data Extraction & Preprocessing**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part2.html);
+   * [**Part 3: Outlier Analysis**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part3.html) (*under construction*);
+   * [**Part 4: Inferential Analysis**](https://nathankchan.github.io/covid-19-survey-analysis/Analysis_part4.html) (*under construction*); and
 2. a series of **R scripts**, to perform the analysis and generate figures.
