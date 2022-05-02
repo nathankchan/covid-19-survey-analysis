@@ -1,0 +1,117 @@
+---
+title: "COVID-19 Survey Analysis (Part 1: Introduction)"
+author: "Nathan K. Chan"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    number_sections: false
+    code_folding: hide
+    df_print: paged
+---
+
+<!-- **Recommended: For HTML document, hide code snippets by choosing the respective option in top right drop-down menu for improved readability.** -->
+
+***
+
+**To visit this project on GitHub, please visit this link:** [https://nathankchan.github.io/covid-19-survey-analysis/](https://nathankchan.github.io/covid-19-survey-analysis/)
+
+*NB: Show or hide all code snippets using the* `Code` *button located in the upper right corner.*
+
+<center><span style = "color:blue">**Please note that this report is under development and may be modified at a later time.**</span></center>
+
+***
+
+## **Table of Contents**
+
+1. [**Preamble**](#preamble)
+2. [**Introduction**](#intro)
+3. [**Getting Started**](#start)
+4. [**Next Steps**](#next)
+
+# 1. Preamble {#preamble}
+
+***
+
+This R project produces an analysis of self-reported web-based survey data. It is intended to serve as a code demonstration for several advanced statistical methods, including:
+
+  * **multiple imputation** via [MICE](https://cran.r-project.org/web/packages/mice/mice.pdf), to impute missing data of arbitrary type (continuous, ordinal, or categorical);
+  * **outlier analysis** via [OuRS](https://github.com/derekbeaton/OuRS), to identify extreme observations and problematic variables;
+  * **generalized partial least squares correspondence analysis** (PLSCA) via [TExPosition](https://github.com/derekbeaton/ExPosition1/tree/master/TExPosition), to characterize the strongest (multivariate) associations between groups of related variables and all other variables in the databse; and
+  * **visualizations** of multivariate associations via [ggplot2](https://ggplot2.tidyverse.org/) and [Plotly](https://plotly.com/r/), to aid with interpretation of PLSCA results.
+  
+This project makes extensive use of R packages created by [Derek Beaton](https://github.com/derekbeaton), especially for OuRS and TExPosition. *Derek* - thank you for the time and dedication you took to developing these tools and enabling multivariate mixed data analyses!
+
+Data used in the preparation of this project was obtained from the [**COVID-19 Behavior Determinants Database**](https://doi.org/10.7910/DVN/NILCAV). Data collection and sharing of this database was funded by the Centre for Addiction and Mental Health (CAMH) Foundation.
+
+# 2. Introduction {#intro}
+
+***
+
+The COVID-19 pandemic introduced unprecedented and disruptive changes to society. Characterizing how such changes have impacted individual health and wellness is important for informing public health policy discussions. 
+
+To this end, scientists at CAMH conducted a self-reported web-based survey of persons located in the U.S. or Canada, collecting information about their socioeconomic & demographic status, mental wellness, and behaviour during the COVID-19 pandemic. Participants were located in the most populous U.S. states (New York, California, Florida, and Texas) and Canadian provinces (excluding Quebec). Data were collected at three time points: May 2020, July 2020, and March 2021. 
+
+Scientists [previously reported](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8598046/) findings from this database using a traditional hypothesis-driven approach - a common paradigm in academic research used to generate formal evidence supporting a proposed explanation. Nevertheless, hypotheses that were not considered or tested could reveal other important findings, but given the size of the database, exhaustively testing all possible hypotheses would be both impractical and statistically inappropriate.
+
+Using a data-driven approach may reveal additional information from the database. Data-driven approaches are designed to generate new hypotheses from the data instead of supportive evidence for a particular explanation. They aim to characterize the underlying "variance structure" of a dataset, helping the user intuitively grasp associations between groups of variables and potentially identify unexpected relationships. 
+
+**Thus, the aim of this project is to investigate the COVID-19 Behaviour Determinants Database using an exploratory, data-driven approach. In doing so, I hope to identify the strongest and any unexpected associations between variables of interest and other variables in the dataset.**
+
+# 3. Getting Started {#start}
+
+***
+
+**This analysis requires** ***R*** **to be installed.** If it is not installed, please visit [r-project.org](https://www.r-project.org/) to download the latest version. 
+
+This project was built with **R version 4.1.2 "Bird Hippie"**. To reproduce this analysis *exactly*, please ensure that the correct package versions are installed on your machine.
+
+**This analysis requires the following** ***R*** **packages:**
+
+  * [*dataverse*](https://github.com/IQSS/dataverse-client-r)
+  * [*mice*](https://cran.r-project.org/web/packages/mice/mice.pdf)
+  * [*knitr*](https://yihui.org/knitr/)
+  * [*kableExtra*](https://haozhu233.github.io/kableExtra/)
+  * [*tidyverse*](https://www.tidyverse.org/)
+  * [*haven*](https://cran.r-project.org/web/packages/haven/index.html)
+  * [*plotly*](https://plotly.com/r/)
+  * [*htmlwidgets*](https://www.htmlwidgets.org/)
+  * [*shiny*](https://shiny.rstudio.com/)
+  * [*colorspace*](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
+  
+**This analysis also requires the following** ***GitHub*** **packages:**
+
+  * [*derekbeaton/ExPosition1/ExPosition*](https://github.com/derekbeaton/ExPosition1/tree/master/ExPosition)
+  * [*derekbeaton/ExPosition1/TExPosition*](https://github.com/derekbeaton/ExPosition1/tree/master/TExPosition)
+  * [*derekbeaton/GSVD*](https://github.com/derekbeaton/GSVD/)
+  * [*derekbeaton/OuRS/OuRS*](https://github.com/derekbeaton/OuRS/tree/master/OuRS)
+  * [*derekbeaton/GPLS/Package*](https://github.com/derekbeaton/GPLS/tree/master/Package)
+  
+To automatically install required packages, open RStudio and source `00_init.R` (see below for example). The script will ask for your permission to install before proceeding. **Please ensure all packages install successfully before proceeding.** 
+
+**Please restart R and re-run** `00_init.R` if any packages are installed. Packages must be loaded in order to avoid issues with namespace conflicts. Failing to re-source `00_init.R` may result in errors. 
+
+```{r start}
+source(paste0(getwd(), "/scripts/00_init.R"))
+```
+
+## 3.1. Project Structure {#structure}
+
+This project uses a series of R scripts to automate data processing and analysis. Scripts are housed in `./scripts/`, and each script starts with sourcing the immediately preceding script. Scripts write computationally expensive intermediates in `./output/` and pass R objects downstream. This system enables the user to make changes at any point of the analysis pipeline while balancing performance needs.
+
+To improve performance, computationally expensive intermediates are loaded by scripts if (1) the file is available AND (2) the input to the intermediate is unchanged from the time the script was last run. Otherwise, the intermediate is re-computed and written out before continuing. Note that certain steps (e.g., multiple imputation as performed in `02_cleandata.R`) may take several hours to complete if their intermediates are modified or deleted.
+
+# 4. Next Steps {#next}
+
+***
+
+The remainder of this report is divided into several sections.
+
+[**Data extraction & pre-processing**]() demonstrates an automated process to download data from [Harvard Dataverse](https://dataverse.harvard.edu/). The report then examines the structure of the data and prepares it for later analysis. Key topics discussed include *data cleaning* and *imputation of missing data*.
+
+**Outlier analysis** takes the prepared dataset and examines it for any potential outliers by computing a "multivariate standard deviation". The most important variables contributing to the "outlierness" of observations are also identified. Key topics discussed include *Mahalanobis distances* and the *Garthwaite-Koch partition*.
+
+Finally, **inferential analysis** illustrates the magnitude and direction of statistical associations between groups of variables of interest (e.g., responses about vaccine hesitancy behaviours) and all other variables in the dataset. Key topics discussed include *correspondence analysis* and *data visualization*.
