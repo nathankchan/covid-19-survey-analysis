@@ -14,15 +14,7 @@ coviddata_num <- coviddata[, which(sapply(coviddata, is.numeric))]
 
 # Make a data frame listing the question and values for each column of
 # coviddata_num
-datadict <- sapply(
-  coviddata_num,
-  function(x) {
-    a <- attr(x, "label", exact = TRUE)
-    b <- attr(x, "labels", exact = TRUE)
-    d <- table(x, useNA = "ifany")
-    return(list("Question" = a, "Values" = b, "Table" = d))
-  }, simplify = F
-)
+datadict <- sapply(coviddata, get_var_info, simplify = F)
 
 # Make it easier to work with the dataset
 attach(coviddata_num)
@@ -60,15 +52,7 @@ attach(coviddata_exclNA)
 
 # Sift through datadict_exclNA and categorize each variable by type (i.e., 
 # categorical, ordinal, continuous, has NA or missing values)
-datadict_exclNA <- sapply(
-  coviddata_exclNA,
-  function(x) {
-    a <- attr(x, "label", exact = TRUE)
-    b <- attr(x, "labels", exact = TRUE)
-    d <- table(x, useNA = "ifany")
-    return(list("Question" = a, "Values" = b, "Table" = d))
-  }, simplify = F
-)
+datadict_exclNA <- sapply(coviddata_exclNA, get_var_info, simplify = F)
 
 vars_cat <- bind_cols(
   "Timepoint_1"     = Timepoint_1,      # Identifier for time when survey collected
@@ -691,7 +675,7 @@ rm(
   C1B,
   C1C,
   C2,
-  coviddata,
+  # coviddata,
   coviddata_exclNA,
   # coviddata_imp,
   coviddata_num,
@@ -706,7 +690,7 @@ rm(
   data_preimpute_catnom_NA,
   data_preimpute_con_NA,
   data_preimpute_ord_NA,
-  datadict,
+  # datadict,
   datadict_exclNA,
   # datadict_imp,
   haven_binarize_yesno,
@@ -757,4 +741,4 @@ rm(
   vars_ord_NA
 )
 
-message("./scripts/02_cleandata.R was executed.")
+message("./scripts/02_cleandata.R was executed")
