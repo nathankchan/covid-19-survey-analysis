@@ -568,6 +568,7 @@ if (file.exists(paste0(getwd(), "/output/data_impute_catbin_NA.RDS"))) {
 
 if (setequal(data_check$data, data_preimpute_catbin_NA)) {
   data_impute_catbin_NA <- data_check
+  message("data_impute_catbin_NA read in from ./output/data_impute_catbin_NA.RDS")
 } else {
   data_impute_catbin_NA <- mice(
     data = data_preimpute_catbin_NA,
@@ -576,6 +577,7 @@ if (setequal(data_check$data, data_preimpute_catbin_NA)) {
   )
   saveRDS(object = data_impute_catbin_NA, 
           file = paste0(getwd(), "/output/data_impute_catbin_NA.RDS"))
+  message("data_impute_catbin_NA saved to ./output/data_impute_catbin_NA.RDS")
 }
 
 if (file.exists(paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))) {
@@ -586,6 +588,7 @@ if (file.exists(paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))) {
 
 if (setequal(data_check$data, data_preimpute_catnom_NA)) {
   data_impute_catnom_NA <- data_check
+  message("data_impute_catnom_NA read in from ./output/data_impute_catnom_NA.RDS")
 } else {
   data_impute_catnom_NA <- mice(
     data = data_preimpute_catnom_NA,
@@ -595,6 +598,7 @@ if (setequal(data_check$data, data_preimpute_catnom_NA)) {
   
   saveRDS(object = data_impute_catnom_NA, 
           file = paste0(getwd(), "/output/data_impute_catnom_NA.RDS"))
+  message("data_impute_catnom_NA saved to ./output/data_impute_catnom_NA.RDS")
 }
 
 if (file.exists(paste0(getwd(), "/output/data_impute_ord_NA.RDS"))) {
@@ -605,6 +609,7 @@ if (file.exists(paste0(getwd(), "/output/data_impute_ord_NA.RDS"))) {
 
 if (setequal(data_check$data, data_preimpute_ord_NA)) {
   data_impute_ord_NA <- data_check
+  message("data_impute_ord_NA read in from ./output/data_impute_ord_NA.RDS")
 } else {
   data_impute_ord_NA <- mice(
     data = data_preimpute_ord_NA,
@@ -614,6 +619,7 @@ if (setequal(data_check$data, data_preimpute_ord_NA)) {
   
   saveRDS(object = data_impute_ord_NA, 
           file = paste0(getwd(), "/output/data_impute_ord_NA.RDS"))
+  message("data_impute_ord_NA saved to ./output/data_impute_ord_NA.RDS")
 }
 
 if (file.exists(paste0(getwd(), "/output/data_impute_con_NA.RDS"))) {
@@ -624,6 +630,7 @@ if (file.exists(paste0(getwd(), "/output/data_impute_con_NA.RDS"))) {
 
 if (setequal(data_check$data, data_preimpute_con_NA)) {
   data_impute_con_NA <- data_check
+  message("data_impute_con_NA read in from ./output/data_impute_con_NA.RDS")
 } else {
   data_impute_con_NA <- mice(
     data = data_preimpute_con_NA,
@@ -633,6 +640,7 @@ if (setequal(data_check$data, data_preimpute_con_NA)) {
   
   saveRDS(object = data_impute_con_NA, 
           file = paste0(getwd(), "/output/data_impute_con_NA.RDS"))
+  message("data_impute_con_NA saved to ./output/data_impute_con_NA.RDS")
 }
 
 data_complete <- left_join(
@@ -659,6 +667,13 @@ detach(coviddata_exclNA)
 
 coviddata_imp <- data_complete
 datadict_imp <- datadict[names(data_complete)]
+
+for (i in 1:length(datadict_imp)) {
+  varname <- names(datadict_imp[i])
+  datadict_imp[[i]]$Table <- 
+    table(coviddata_imp[, names(datadict_imp[i])], useNA = "ifany")
+}
+
 vars_imp <- list(
   cat = c(names(vars_cat),
           names(vars_catbin_NA),
@@ -670,6 +685,7 @@ vars_imp <- list(
 )
 
 write_csv(data_complete, file = paste0(getwd(), "/output/data_imputed.csv"))
+message("data_complete saved to ./output/data_imputed.csv")
 
 rm(
   C1B,
