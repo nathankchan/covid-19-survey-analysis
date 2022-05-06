@@ -276,3 +276,273 @@ get_var_info <- function(x) {
   d <- table(x, useNA = "ifany")
   return(list("Question" = a, "Values" = b, "Table" = d))
 }
+
+
+#' @title Get the original variable name after data doubling methods
+#'
+#' @description Retrieves a variable's name after running
+#'   `ours::disjunctive_coding()`, `ours::escofier_coding()`, or
+#'   `ours::thermometer_coding()`.
+#'
+#' @param x A list or vector containing the names of variables suffixed by `+`,
+#'   `-`, or `.{label}`.
+#'
+#' @return A vector containing the names of the variables with suffixes removed
+#'
+#' @examples
+#' \dontrun{
+#' mydata <- c("var1+", "var1-", "var2.A", "var2.B")
+#' varname_from_disjunc(mydata)
+#' }
+#'
+#' @author N. Chan
+#' @export
+#' 
+
+varname_from_disjunc <- Vectorize(
+  FUN = function(x) {
+    if (grepl("(\\+$)|(\\-$)", x = x)) {
+      varname <- str_replace(x, "(\\+$)|(\\-$)", "")
+    } else {
+      varname <- str_replace(x, "(\\.[\\s\\S]{1,})", "")
+    }
+    return(varname)
+  },
+  vectorize.args = "x"
+)
+
+
+#' @title Get outlier statistics following MCD and corrmax transformation
+#'
+#' @description Identifies outliers based on Mahalanobis distances and robust
+#'   distances computed from outputs of `ours::mixed_mcd_data()` and
+#'   `ours::generalized_corrmax()`. Modified from code in OuRS.
+#'
+#' @param mcd_results The output of `ours::mixed_mcd_data()`
+#' @param mcd_corrmax The output of `ours::generalized_corrmax()`. Should be
+#'   computed using the same data that was used to make `mcd_results`.
+#' @param data The original data frame fed to `ours`.
+#' @param md_thresh The threshold value used to identify outliers from
+#'   Mahalanobis and robust distance metrics. Default is the square root of the
+#'   97.5% quantile of a chi square distribution with $k$ degrees of freedom,
+#'   where $k$ is the original number of variables in the dataset (i.e., before
+#'   data doubling).
+#' @param cor_thresh The threshold value used to identify the most important
+#'   contributors to outlier's distance metrics. Default is 10.
+#'
+#' @return A list containing two data frames. `$md_scores_outliers` lists all
+#'   cases with distance metrics greater than `md_thresh`. `$contributions`
+#'   lists the most important variables contributing to cases containing
+#'   outliers.
+#'
+#' @examples
+#' \dontrun{
+#' mydata <- c("var1+", "var1-", "var2.A", "var2.B")
+#' varname_from_disjunc(mydata)
+#' }
+#'
+#' @author N. Chan
+#' @export
+#' 
+
+get_outlier_stats <-
+  function(mcd_results,
+           mcd_corrmax,
+           data,
+           md_thresh = NULL,
+           cor_thresh = 1) {
+    mcd_res <- mcd_results
+    sqrt_rob_md <- mcd_res$dists$robust_mahal_dists
+    sqrt_stand_md <- mcd_res$dists$mahal_dists
+    md_scores <- sqrt(cbind(sqrt_stand_md, sqrt_rob_md))
+    
+    md_scores_all <- md_scores[order(md_scores[, 2], md_scores[, 1], decreasing = T), , drop = F]
+    
+    if (is.null(md_thresh)) {
+      chisq_df <-
+        mcd_corrmax$contributions %>% colnames %>% varname_from_disjunc %>% unique %>% length
+      md_thresh <- sqrt(qchisq(p = 1 - 0.025, df = chisq_df))
+    } else {
+      md_thresh <- md_thresh
+    }
+    
+    md_scores_outliers <-
+      md_scores[which(md_scores[, 1] > md_thresh |
+                        md_scores[, 2] > md_thresh), , drop = F]
+    
+    # browser()
+    
+    if (length(md_scores_outliers) > 1) {
+      md_scores_outliers <-
+        md_scores_outliers[order(md_scores_outliers[, 2], md_scores_outliers[, 1], decreasing = T), , drop = F]
+      
+      # cor_res <- mcd_corrmax$contributions
+      cor_res <- mcd_corrmax$contributions
+      cor_res <-
+        cor_res[as.numeric(rownames(md_scores_outliers)), , drop = F]
+      rownames(cor_res) <- rownames(md_scores_outliers)
+      
+      cor_contrib_per_obs_df <- get_varwise_sum(cor_res, data = data)
+      cor_contrib_per_obs_df <- cor_contrib_per_obs_df[which(cor_contrib_per_obs_df$contribution > cor_thresh), ]
+      
+      out <- list(
+        md_thresh = md_thresh,
+        md_scores = 
+          list(all = md_scores_all,
+               outliers = md_scores_outliers),
+        cor_thresh = cor_thresh,
+        contributions = cor_contrib_per_obs_df
+        )
+    } else {
+      out <- list(
+        md_thresh = md_thresh,
+        md_scores = 
+          list(all = md_scores_all,
+               outliers = NULL),
+        cor_thresh = cor_thresh,
+        contributions = NULL
+        )
+    }
+    
+    return(out)
+  }
+
+
+#' @title Make distance and variable contribution plots
+#'
+#' @description Makes (1) a plot of sqrt Mahalanobis distance vs sqrt robust
+#'   distance and (2) a plot of variable contributions to distance values
+#'
+#' @param outlier_stats The output of `get_outlier_stats()`
+#' @param mcd_corrmax The output of `ours::generalized_corrmax()`. Should be
+#'   computed using the same data that was used to make `outlier_stats`.
+#' @param data The original data frame fed to `ours`
+#'
+#' @return A list containing two ggplot2 objects. `$md_plot` contains the sqrt MD
+#'   vs sqrt RD plot, and `$corr_plot` contains the variable contributions plot
+#'
+#' @examples
+#' \dontrun{
+#' }
+#'
+#' @author N. Chan
+#' @export
+#' 
+
+plot_outliers <- function(outlier_stats,
+                          mcd_corrmax,
+                          data) {
+  
+  md_plot_data <- as.data.frame(outlier_stats$md_scores$all)
+  md_plot_outliers <- as.data.frame(outlier_stats$md_scores$outliers)
+  md_plot_thresh <- outlier_stats$md_thresh
+  cor_thresh <- outlier_stats$cor_thresh
+  
+  md_plot <-
+    ggplot(md_plot_data, aes(x = sqrt_stand_md, y = sqrt_rob_md)) + 
+    geom_point() +
+    geom_hline(aes(yintercept = md_plot_thresh), linetype = 2, color = "red") +
+    geom_vline(aes(xintercept = md_plot_thresh), linetype = 2, color = "red")
+  
+  if (!(is.null(md_plot_outliers))) {
+    md_plot_outliers$label <- rownames(md_plot_outliers)
+    md_plot <- md_plot +
+      geom_point(data = md_plot_outliers, aes(x = sqrt_stand_md, y = sqrt_rob_md), color = "red") +
+      geom_text(data = md_plot_outliers, aes(x = sqrt_stand_md, y = sqrt_rob_md, label = label), color = "red", nudge_x = 0.075, nudge_y = 0.15, angle = 45)
+    
+    corr_percent_contrib <- mcd_corrmax$percentage_contributions
+    rownames(corr_percent_contrib) <- rownames(data)
+    corr_plot_outliers_data <- get_varwise_sum(corr_percent_contrib, data = data)
+    corr_plot_outliers_data <-
+      corr_plot_outliers_data[which(corr_plot_outliers_data$subject %in% rownames(md_plot_outliers)), ]
+    corr_plot_outliers <-
+      ggplot(corr_plot_outliers_data, aes(x = subject, y = varname, fill = contribution)) +
+      geom_tile() +
+      scale_fill_continuous(type = "viridis", name = "percentage_contribution") + theme_classic()
+
+  } else {
+    corr_plot_outliers <- NULL
+  }
+  
+  md_plot <- md_plot + theme_classic()
+  
+  cor_res <- mcd_corrmax$contributions
+  rownames(cor_res) <- rownames(data)
+  corr_plot_data <- get_varwise_sum(cor_res, data = data)
+
+  corr_plot <-
+    ggplot(corr_plot_data, aes(x = subject, y = varname, fill = contribution)) + 
+    geom_tile() +
+    scale_fill_continuous(type = "viridis") + theme_classic()
+  
+  return(list(
+    md_plot = md_plot,
+    corr_plot = corr_plot, 
+    corr_plot_outliers = corr_plot_outliers
+  ))
+  
+}
+
+
+
+
+#' @title Get variable-wise values by observation
+#'
+#' @description Recombines values across columns according to some "basename"
+#'
+#' @param mat A matrix of numerical data with disjunctive data (e.g., columns
+#'   are named "var1+", "var1-", "var2.A", "var2.B", etc.). Usually the output
+#'   of data transformed by `ours::disjunctive_coding()`,
+#'   `ours::escofier_coding()`, or `ours::thermometer_coding()`.
+#' @param data The original data frame fed to functions in `ours`.
+#'
+#' @return A matrix with the same number of rows as `data`. Columns contain the
+#'   row-wise sums of their respective variables in `data` according to the
+#'   unique "basename".
+#'
+#' @examples
+#' \dontrun{
+#' }
+#'
+#' @author N. Chan
+#' @export
+#' 
+
+get_varwise_sum <- function(mat,
+                            data) {
+  cor_res <- mat
+  
+  cor_contrib_per_obs <-
+    apply(cor_res,
+          1,
+          function (x) {
+            out <- x
+            names(out) <-
+              varname_from_disjunc(names(out))
+            out <-
+              tapply(out, names(out), sum)
+            out <- sort(out, decreasing = T)
+            out <- data.frame(
+              subject = rep_len(NA, length(out)),
+              varname = names(out),
+              contribution = out
+            )
+            return(out)
+          },
+          simplify = F)
+  
+  cor_contrib_per_obs_df <- do.call("rbind", cor_contrib_per_obs)
+  cor_contrib_per_obs_df$subject <-
+    rep(names(cor_contrib_per_obs), unlist(lapply(cor_contrib_per_obs, nrow)))
+  rownames(cor_contrib_per_obs_df) <- NULL
+  
+  
+  cor_contrib_per_obs_df$value <-
+    apply(cor_contrib_per_obs_df, 1,
+          function(x) {
+            as.character(data[x[["subject"]],
+                              x[["varname"]]])
+          }, simplify = T)
+  
+  return(cor_contrib_per_obs_df)
+}
